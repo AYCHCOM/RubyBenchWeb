@@ -5,7 +5,7 @@ working_directory = app_path
 
 worker_processes (ENV["UNICORN_WORKERS"] || 3).to_i
 
-listen (ENV["UNICORN_PORT"] || 3000).to_i
+listen (ENV["PORT"] || 3000).to_i
 
 #if ENV["RAILS_ENV"] == "production"
   #stderr_path "/shared/log/rails/unicorn.stderr.log"
