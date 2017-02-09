@@ -1,0 +1,23 @@
+<h1 class="text-center">New Custom Run</h1>
+<%= form_for :custom_run, url: custom_runs_path do |f| %>
+  <table class="custom-run-form">
+    <tr>
+      <td><%= f.label :organization %></td>
+      <td><%= f.text_field :organization, value: 'ruby', size: '50' %></td>
+    </tr>
+   
+    <tr>
+      <td><%= f.label :repo %></td>
+      <td><%= f.text_field :repo, value: 'ruby', size: '50' %></td>
+    </tr>
+
+    <tr>
+      <td><%= f.label :commit %></td>
+      <td><%= f.text_field :commit, size: '50' %></td>
+    </tr>
+   
+  </table>
+  <div class="text-center">
+    <%= f.submit value: 'Run custom benchmark', class: 'btn btn-primary' %>
+  </div>
+<% end %>

@@ -23,6 +23,10 @@ Rails.application.routes.draw do
   get ':organization_name/:repo_name/commits/overview' => 'repos#index', as: :repos
   get ':organization_name/:repo_name/commits' => 'repos#show', as: :repo
   get ':organization_name/:repo_name/releases' => 'repos#show_releases', as: :releases_repo
+
+  resources :custom_runs, only: [:index, :new, :create]
+  # get 'custom_runs' => 'custom_runs#index'
+  # get 'custom_runs/new' => 'custom_runs#new'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
