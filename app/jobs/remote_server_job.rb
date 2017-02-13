@@ -29,7 +29,7 @@ class RemoteServerJob < ActiveJob::Base
 
     execute_ssh_commands(ssh,
       [
-        "docker pull rubybench/ruby_trunk",
+        "docker pull shopifydockerhub/rubybench_ruby_trunk",
         "docker run --rm
           -e \"RUBY_BENCHMARKS=#{options[:ruby_benchmarks]}\"
           -e \"RUBY_MEMORY_BENCHMARKS=#{options[:ruby_memory_benchmarks]}\"
@@ -40,7 +40,7 @@ class RemoteServerJob < ActiveJob::Base
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
           -e \"API_URL=shopify-rubybench.herokuapp.com\"
           #{build_include_patterns(options[:include_patterns])}
-          rubybench/ruby_trunk".squish
+          shopifydockerhub/rubybench_ruby_trunk".squish
       ]
     )
   end
