@@ -38,6 +38,7 @@ class RemoteServerJob < ActiveJob::Base
           -e \"RUBY_COMMIT_HASH=#{commit_hash}\"
           -e \"API_NAME=#{Rails.application.secrets.api_name}\"
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+          -e \"API_URL=shopify-rubybench.herokuapp.com\"
           #{build_include_patterns(options[:include_patterns])}
           rubybench/ruby_trunk".squish
       ]
@@ -63,6 +64,7 @@ class RemoteServerJob < ActiveJob::Base
           -e \"LIQUID_BENCHMARK=#{options[:liquid_benchmarks]}\"
           -e \"API_NAME=#{Rails.application.secrets.api_name}\"
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+          -e \"API_URL=shopify-rubybench.herokuapp.com\"
           #{build_include_patterns(options[:include_patterns])}
           rubybench/ruby_releases".squish
       ]
@@ -81,6 +83,7 @@ class RemoteServerJob < ActiveJob::Base
           -e \"RUBY_VERSION=#{ruby_version}\"
           -e \"API_NAME=#{Rails.application.secrets.api_name}\"
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+          -e \"API_URL=shopify-rubybench.herokuapp.com\"
           rubybench/ruby_releases_discourse".squish,
         "docker stop discourse_postgres discourse_redis",
         "docker rm -v discourse_postgres discourse_redis"
@@ -98,6 +101,7 @@ class RemoteServerJob < ActiveJob::Base
           --link discourse_redis:redis -e \"RUBY_COMMIT_HASH=#{commit_hash}\"
           -e \"API_NAME=#{Rails.application.secrets.api_name}\"
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+          -e \"API_URL=shopify-rubybench.herokuapp.com\"
           rubybench/ruby_trunk_discourse".squish,
         "docker stop discourse_postgres discourse_redis",
         "docker rm -v discourse_postgres discourse_redis"
@@ -122,6 +126,7 @@ class RemoteServerJob < ActiveJob::Base
           -e \"RAILS_VERSION=#{rails_version}\"
           -e \"API_NAME=#{Rails.application.secrets.api_name}\"
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+          -e \"API_URL=shopify-rubybench.herokuapp.com\"
           #{custom_env}
           #{build_include_patterns(options[:include_patterns])}
           rubybench/rails_releases".squish,
@@ -145,6 +150,7 @@ class RemoteServerJob < ActiveJob::Base
           -e \"RAILS_COMMIT_HASH=#{commit_hash}\"
           -e \"API_NAME=#{Rails.application.secrets.api_name}\"
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+          -e \"API_URL=shopify-rubybench.herokuapp.com\"
           -e \"MYSQL2_PREPARED_STATEMENTS=1\"
           #{build_include_patterns(options[:include_patterns])}
           rubybench/rails_trunk".squish,
@@ -162,6 +168,7 @@ class RemoteServerJob < ActiveJob::Base
           -e \"BUNDLER_VERSION=#{bundler_version}\"
           -e \"API_NAME=#{Rails.application.secrets.api_name}\"
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+          -e \"API_URL=shopify-rubybench.herokuapp.com\"
           #{build_include_patterns(options[:include_patterns])}
           rubybench/bundler_releases".squish
       ]
