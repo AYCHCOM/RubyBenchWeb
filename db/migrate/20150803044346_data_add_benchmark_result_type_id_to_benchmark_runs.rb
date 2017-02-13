@@ -60,9 +60,6 @@ class DataAddBenchmarkResultTypeIdToBenchmarkRuns < ActiveRecord::Migration
           .benchmark_types.destroy_all
       rescue
       end
-
-
-
     end
   end
 end
