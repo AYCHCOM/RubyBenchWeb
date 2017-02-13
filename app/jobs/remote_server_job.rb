@@ -58,6 +58,7 @@ class RemoteServerJob < ActiveJob::Base
       [
         "docker pull rubybench/ruby_releases",
         "docker run --rm
+          -e \"ORGANIZATION=#{options[:organization]}\"
           -e \"RUBY_BENCHMARKS=#{options[:ruby_benchmarks]}\"
           -e \"RUBY_MEMORY_BENCHMARKS=#{options[:ruby_memory_benchmarks]}\"
           -e \"RUBY_VERSION=#{ruby_version}\"
@@ -81,6 +82,7 @@ class RemoteServerJob < ActiveJob::Base
         "docker run --rm
           --link discourse_postgres:postgres
           --link discourse_redis:redis
+          -e \"ORGANIZATION=#{options[:organization]}\"
           -e \"RUBY_VERSION=#{ruby_version}\"
           -e \"API_NAME=#{Rails.application.secrets.api_name}\"
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
@@ -100,6 +102,7 @@ class RemoteServerJob < ActiveJob::Base
         "docker run --name discourse_postgres -d postgres:9.3.5",
         "docker run --rm --link discourse_postgres:postgres
           --link discourse_redis:redis -e \"RUBY_COMMIT_HASH=#{commit_hash}\"
+          -e \"ORGANIZATION=#{options[:organization]}\"
           -e \"API_NAME=#{Rails.application.secrets.api_name}\"
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
           -e \"API_URL=shopify-rubybench.herokuapp.com\"
@@ -124,6 +127,7 @@ class RemoteServerJob < ActiveJob::Base
           --link postgres:postgres
           --link mysql:mysql
           --link redis:redis
+          -e \"ORGANIZATION=#{options[:organization]}\"
           -e \"RAILS_VERSION=#{rails_version}\"
           -e \"API_NAME=#{Rails.application.secrets.api_name}\"
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
@@ -148,6 +152,7 @@ class RemoteServerJob < ActiveJob::Base
           --link postgres:postgres
           --link mysql:mysql
           --link redis:redis
+          -e \"ORGANIZATION=#{options[:organization]}\"
           -e \"RAILS_COMMIT_HASH=#{commit_hash}\"
           -e \"API_NAME=#{Rails.application.secrets.api_name}\"
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
@@ -166,6 +171,7 @@ class RemoteServerJob < ActiveJob::Base
       [
         "docker pull rubybench/bundler_releases",
         "docker run --rm
+          -e \"ORGANIZATION=#{options[:organization]}\"
           -e \"BUNDLER_VERSION=#{bundler_version}\"
           -e \"API_NAME=#{Rails.application.secrets.api_name}\"
           -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
