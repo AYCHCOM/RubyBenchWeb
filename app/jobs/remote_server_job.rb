@@ -21,8 +21,8 @@ class RemoteServerJob < ActiveJob::Base
 
   def ruby_trunk(ssh, commit_hash, options)
     options.reverse_merge!({
-      ruby_benchmarks: true,
-      ruby_memory_benchmarks: true,
+      ruby_benchmarks: false,
+      ruby_memory_benchmarks: false,
       optcarrot_benchmarks: true,
       liquid_benchmarks: true
     })
@@ -48,8 +48,8 @@ class RemoteServerJob < ActiveJob::Base
 
   def ruby_releases(ssh, ruby_version, options)
     options.reverse_merge!({
-      ruby_benchmarks: true,
-      ruby_memory_benchmarks: true,
+      ruby_benchmarks: false,
+      ruby_memory_benchmarks: false,
       optcarrot_benchmarks: true,
       liquid_benchmarks: true
     })
