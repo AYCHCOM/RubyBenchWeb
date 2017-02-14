@@ -22,31 +22,39 @@ class CustomRunsController < AdminController
     body = JSON.parse(res.body, symbolize_names: true)
     commit_hash = {
       sha1: params[:commit],
-      url: "https://github.com/#{params[:organization]}/#{params[:repo]}/commit/#{params[:commit]}",
+      url: body[:html_url],
       message: body[:message].truncate(30),
-      timestamp: body[:committer][:date]
+      timestamp: body[:committer][:date],
+      author_name: body[:author][:name]
     }
-
-    puts commit_hash
 
     if create_commit(commit_hash, repo.id)
       BenchmarkPool.enqueue(params[:repo], params[:commit], params[:organization])
+    else
+      render status: 500
     end
 
     redirect_to custom_runs_path
   end
 
   private
+
   def custom_run_params
     params.require(:custom_run).permit(:organization, :repo, :commit)
   end
 
   def create_commit(commit, repo_id)
-    Commit.find_or_create_by(sha1: commit[:sha1]) do |c|
-      c.url = commit[:url]
-      c.message = commit[:message]
-      c.repo_id = repo_id
-      c.created_at = commit[:timestamp]
+    if valid_commit?(commit)
+      Commit.find_or_create_by(sha1: commit[:sha1]) do |c|
+        c.url = commit[:url]
+        c.message = commit[:message]
+        c.repo_id = repo_id
+        c.created_at = commit[:timestamp]
+      end
     end
+  end
+
+  def valid_commit?(commit)
+    !Commit.merge_or_skip_ci?(commit[:message]) && Commit.valid_author?(commit[:author_name])
   end
 end
