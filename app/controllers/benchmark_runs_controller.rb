@@ -6,7 +6,7 @@ class BenchmarkRunsController < APIController
 
     initiator =
       if params[:commit_hash]
-        initiator = repo.commits.find_or_create_by!(sha1: params[:commit_hash])
+        initiator = repo.commits.find_by_sha1(params[:commit_hash])
       elsif params[:version]
         initiator = repo.releases.find_or_create_by!(version: params[:version])
       end

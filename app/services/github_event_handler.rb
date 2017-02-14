@@ -37,6 +37,8 @@ class GithubEventHandler
     # Remove this once Github hook is actually coming from the original Ruby
     # repo.
     case [organization_name, repo_name]
+    when ['jerryliu55', 'ruby']
+      organization_name = 'ruby'
     when ['tgxworld', 'ruby']
       organization_name = 'ruby'
     when ['tgxworld', 'rails']
