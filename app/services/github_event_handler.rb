@@ -36,6 +36,7 @@ class GithubEventHandler
 
     # Remove this once Github hook is actually coming from the original Ruby
     # repo.
+    short_repository_url = repository_url[0..((repository_url.length - 2) - repo_name.length - organization_name.length)]
     case [organization_name, repo_name]
     when ['Shopify', 'ruby-mirror']
       organization_name = 'ruby'
@@ -49,9 +50,11 @@ class GithubEventHandler
     when ['tgxworld', 'bundler']
       organization_name = 'bundler'
     end
+    organization_url = "#{short_repository_url}#{organization_name}"
+    repository_url = "#{organization_url}/#{repo_name}"
 
     organization = Organization.find_or_create_by(
-      name: organization_name, url: repository_url[0..((repository_url.length - 1) - repo_name.length)]
+      name: organization_name, url: organization_url
     )
 
     Repo.find_or_create_by(
