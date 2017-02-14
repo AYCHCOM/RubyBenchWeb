@@ -22,6 +22,7 @@ class Repo < ApplicationRecord
         benchmark_runs = BenchmarkRun.select(:initiator_id, :result, :initiator_type).fetch_commit_benchmark_runs(
           benchmark_type.category,
           benchmark_result_type,
+          self.id,
           2000
         )
 

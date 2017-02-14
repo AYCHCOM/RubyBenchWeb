@@ -39,7 +39,7 @@ class ReposController < ApplicationController
           [JSON.parse(columns).symbolize_keys!, benchmark_result_type]
         else
           benchmark_runs = BenchmarkRun.fetch_commit_benchmark_runs(
-            @form_result_type, benchmark_result_type, @benchmark_run_display_count
+            @form_result_type, benchmark_result_type, @repo.id, @benchmark_run_display_count
           )
 
           next if benchmark_runs.empty?
