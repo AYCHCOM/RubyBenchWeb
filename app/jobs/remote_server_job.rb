@@ -21,9 +21,9 @@ class RemoteServerJob < ActiveJob::Base
 
   def ruby_trunk(ssh, commit_hash, options)
     options.reverse_merge!({
-      ruby_benchmarks: false,
-      ruby_memory_benchmarks: false,
-      optcarrot_benchmarks: false,
+      ruby_benchmarks: true,
+      ruby_memory_benchmarks: true,
+      optcarrot_benchmarks: true,
       liquid_benchmarks: true
     })
 
