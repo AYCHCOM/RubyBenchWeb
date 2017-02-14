@@ -8,7 +8,7 @@ class CustomRunsController < AdminController
     #BenchmarkPool.enqueue(params[:repo], params[:commit])
     
     # get commit message from github api
-    uri = URI.parse("https://api.github.com/repos/#{params[:organization]}/#{params[:repo]}/git/commits/#{params[:commit]}")
+    uri = URI.parse("https://api.github.com/repos/#{params[:organization]}/#{params[:repo]}/commits/#{params[:commit]}")
     req = Net::HTTP::Get.new(uri)
     req.add_field("Authorization", "token #{ENV['GITHUB_API_TOKEN']}")
     http = Net::HTTP.new(uri.host, uri.port)
