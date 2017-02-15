@@ -8,9 +8,14 @@ class GithubEventHandler
   end
 
   def handle
-    case @request.env[HEADER]
-    when PUSH
-      process_push
+    @request.body.rewind
+    @payload_body = @request.body.read
+    
+    if verify_signature(@payload_body, @request)
+      case @request.env[HEADER]
+      when PUSH
+        process_push
+      end
     end
   end
 
@@ -18,17 +23,26 @@ class GithubEventHandler
 
   # Grabs the commits hash and starts job to run benchmarks on remote server.
   def process_push
-    repo = first_or_create_repo(@payload['repository'])
-    commits = @payload['commits'] || [@payload['head_commit']]
+    # ex. ref: "refs/heads/master"
+    branch = @payload['ref'][11..(@payload['ref'].length - 1)]
+    if branch =~ /^((master|trunk)$|benchmark[\w-]*)/
+      repo = first_or_create_repo(@payload['repository'])
+      commits = @payload['commits'] || [@payload['head_commit']]
 
-    commits.each do |commit|
-      if create_commit(commit, repo.id)
-        BenchmarkPool.enqueue(repo.name, commit['id'])
+      commits.each do |commit|
+        if create_commit(commit, repo.id)
+          BenchmarkPool.enqueue(repo.name, commit['id'])
+        end
       end
     end
   end
 
   private
+
+  def verify_signature(payload_body, request)
+    signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), ENV['GITHUB_HOOK_SECRET_TOKEN'], payload_body)
+    Rack::Utils.secure_compare(signature, request.env['HTTP_X_HUB_SIGNATURE'])
+  end
 
   def first_or_create_repo(repository)
     organization_name, repo_name = parse_full_name(repository['full_name'])

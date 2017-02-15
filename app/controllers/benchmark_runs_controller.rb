@@ -22,8 +22,6 @@ class BenchmarkRunsController < APIController
       benchmark_result_type_params
     )
 
-    puts benchmark_result_type
-
     benchmark_run = BenchmarkRun.find_or_initialize_by(
       initiator: initiator, benchmark_type: benchmark_type,
       benchmark_result_type: benchmark_result_type
