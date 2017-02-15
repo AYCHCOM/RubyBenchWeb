@@ -8,9 +8,14 @@ class GithubEventHandler
   end
 
   def handle
-    case @request.env[HEADER]
-    when PUSH
-      process_push
+    @request.body.rewind
+    @payload_body = @request.body.read
+    
+    if verify_signature(@payload_body, @request)
+      case @request.env[HEADER]
+      when PUSH
+        process_push
+      end
     end
   end
 
@@ -33,6 +38,11 @@ class GithubEventHandler
   end
 
   private
+
+  def verify_signature(payload_body, request)
+    signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), ENV['GITHUB_HOOK_SECRET_TOKEN'], payload_body)
+    Rack::Utils.secure_compare(signature, request.env['HTTP_X_HUB_SIGNATURE'])
+  end
 
   def first_or_create_repo(repository)
     organization_name, repo_name = parse_full_name(repository['full_name'])
