@@ -18,12 +18,16 @@ class GithubEventHandler
 
   # Grabs the commits hash and starts job to run benchmarks on remote server.
   def process_push
-    repo = first_or_create_repo(@payload['repository'])
-    commits = @payload['commits'] || [@payload['head_commit']]
+    # ex. ref: "refs/heads/master"
+    branch = @payload['ref'][11..(@payload['ref'].length - 1)]
+    if branch =~ /^((master|trunk)$|benchmark[\w-]*)/
+      repo = first_or_create_repo(@payload['repository'])
+      commits = @payload['commits'] || [@payload['head_commit']]
 
-    commits.each do |commit|
-      if create_commit(commit, repo.id)
-        BenchmarkPool.enqueue(repo.name, commit['id'])
+      commits.each do |commit|
+        if create_commit(commit, repo.id)
+          BenchmarkPool.enqueue(repo.name, commit['id'])
+        end
       end
     end
   end
