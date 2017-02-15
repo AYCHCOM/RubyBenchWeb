@@ -34,9 +34,6 @@ class GithubEventHandler
     organization_name, repo_name = parse_full_name(repository['full_name'])
     repository_url = repository['html_url']
 
-    puts organization_name, repo_name, repository_url
-    ActiveRecord::Base.logger = Logger.new(STDOUT)
-
     # Remove this once Github hook is actually coming from the original Ruby
     # repo.
     short_repository_url = repository_url[0..((repository_url.length - 2) - repo_name.length - organization_name.length)]
