@@ -23,7 +23,7 @@ class CustomRunsController < AdminController
     commit_hash = {
       sha1: params[:commit],
       url: body[:html_url],
-      message: body[:message].truncate(30),
+      message: body[:commit][:message].truncate(30),
       timestamp: body[:committer][:date],
       author_name: body[:author][:name]
     }
