@@ -32,7 +32,7 @@ class ReposController < ApplicationController
           ChartBuilder.construct_from_cache(cache_read, benchmark_result_type)
         else
           benchmark_runs = BenchmarkRun.fetch_commit_benchmark_runs(
-            @form_result_type, benchmark_result_type, @benchmark_run_display_count
+            @form_result_type, benchmark_result_type, @repo.id, @benchmark_run_display_count
           )
 
           next if benchmark_runs.empty?

@@ -31,6 +31,7 @@ class RemoteServerJob < ActiveJob::Base
       [
         "docker pull shopifydockerhub/rubybench_ruby_trunk",
         "docker run --rm
+          -e \"ORGANIZATION=#{options[:organization]}\"
           -e \"RUBY_BENCHMARKS=#{options[:ruby_benchmarks]}\"
           -e \"RUBY_MEMORY_BENCHMARKS=#{options[:ruby_memory_benchmarks]}\"
           -e \"OPTCARROT_BENCHMARK=#{options[:optcarrot_benchmarks]}\"
