@@ -16,8 +16,9 @@ class GithubEventHandlerTest < ActionDispatch::IntegrationTest
       },
       'repository' => {
         'full_name' => 'ruby/ruby',
-        html_url: 'https://github.com/ruby/ruby'
-      }
+        'html_url' => 'https://github.com/ruby/ruby'
+      },
+      'ref' => 'refs/heads/master'
     })
 
     organization = Organization.last
@@ -59,8 +60,9 @@ class GithubEventHandlerTest < ActionDispatch::IntegrationTest
         ],
         'repository' => {
           'full_name' => 'ruby/ruby',
-          html_url: 'https://github.com/ruby/ruby'
-        }
+          'html_url' => 'https://github.com/ruby/ruby'
+        },
+        'ref' => 'refs/heads/master'
     })
 
     organization = Organization.last
@@ -113,8 +115,9 @@ class GithubEventHandlerTest < ActionDispatch::IntegrationTest
         ],
         'repository' => {
           'full_name' => 'ruby/ruby',
-          html_url: 'https://github.com/ruby/ruby'
-        }
+          'html_url' => 'https://github.com/ruby/ruby'
+        },
+        'ref' => 'refs/heads/master'
     })
 
     assert_equal initial, Commit.count
@@ -139,8 +142,9 @@ class GithubEventHandlerTest < ActionDispatch::IntegrationTest
         ],
         'repository' => {
           'full_name' => 'tgxworld/ruby',
-          html_url: 'https://github.com/tgxworld/ruby'
-        }
+          'html_url' => 'https://github.com/tgxworld/ruby'
+        },
+        'ref' => 'refs/heads/master'
     })
 
     organization = Organization.last
@@ -172,8 +176,9 @@ class GithubEventHandlerTest < ActionDispatch::IntegrationTest
         ],
         'repository' => {
           'full_name' => 'tgxworld/rails',
-          html_url: 'https://github.com/tgxworld/rails'
-        }
+          'html_url' => 'https://github.com/tgxworld/rails'
+        },
+        'ref' => 'refs/heads/master'
     })
 
     organization = Organization.last
@@ -190,15 +195,13 @@ class GithubEventHandlerTest < ActionDispatch::IntegrationTest
   private
 
   def post_to_handler(parameters)
+    signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), Rails.application.secrets.github_hook_secret_token, parameters.to_json)
     post(
-      '/github_event_handler', params: parameters,
+      '/github_event_handler', params: parameters.to_json,
       headers: {
         "#{GithubEventHandler::HEADER}" => "#{GithubEventHandler::PUSH}",
-        'HTTP_AUTHORIZATION' =>
-          ActionController::HttpAuthentication::Basic.encode_credentials(
-            Rails.application.secrets.api_name,
-            Rails.application.secrets.api_password
-          )
+        'HTTP_X_HUB_SIGNATURE' => signature,
+        'Content-Type' => 'application/json'
       }
     )
   end

@@ -10,7 +10,7 @@ class GithubEventHandler
   def handle
     @request.body.rewind
     @payload_body = @request.body.read
-    
+
     if verify_signature(@payload_body, @request)
       case @request.env[HEADER]
       when PUSH
@@ -40,7 +40,7 @@ class GithubEventHandler
   private
 
   def verify_signature(payload_body, request)
-    signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), ENV['GITHUB_HOOK_SECRET_TOKEN'], payload_body)
+    signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), Rails.application.secrets.github_hook_secret_token, payload_body)
     Rack::Utils.secure_compare(signature, request.env['HTTP_X_HUB_SIGNATURE'])
   end
 

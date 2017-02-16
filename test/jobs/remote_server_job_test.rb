@@ -8,8 +8,9 @@ class RemoteServerJobTest < ActiveJob::TestCase
 
   test "#perform ruby_trunk" do
     [
-      'tsp docker pull rubybench/ruby_trunk',
+      'tsp docker pull shopifydockerhub/rubybench_ruby_trunk',
       "tsp docker run --rm
+        -e \"ORGANIZATION=ruby\"
         -e \"RUBY_BENCHMARKS=true\"
         -e \"RUBY_MEMORY_BENCHMARKS=false\"
         -e \"OPTCARROT_BENCHMARK=false\"
@@ -17,8 +18,9 @@ class RemoteServerJobTest < ActiveJob::TestCase
         -e \"RUBY_COMMIT_HASH=commit_hash\"
         -e \"API_NAME=#{Rails.application.secrets.api_name}\"
         -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+        -e \"API_URL=shopify-rubybench.herokuapp.com\"
         -e \"INCLUDE_PATTERNS=bm_app_answer,bm_abc\"
-        rubybench/ruby_trunk".squish
+        shopifydockerhub/rubybench_ruby_trunk".squish
     ].each do |command|
 
       @ssh.expects(:exec!).with(command)
@@ -31,7 +33,8 @@ class RemoteServerJobTest < ActiveJob::TestCase
         ruby_memory_benchmarks: false,
         optcarrot_benchmarks: false,
         liquid_benchmarks: false,
-        include_patterns: 'bm_app_answer,bm_abc'
+        include_patterns: 'bm_app_answer,bm_abc',
+        organization: 'ruby'
       }
     )
   end
@@ -40,6 +43,7 @@ class RemoteServerJobTest < ActiveJob::TestCase
     [
       'tsp docker pull rubybench/ruby_releases',
       "tsp docker run --rm
+        -e \"ORGANIZATION=ruby\"
         -e \"RUBY_BENCHMARKS=true\"
         -e \"RUBY_MEMORY_BENCHMARKS=false\"
         -e \"RUBY_VERSION=2.2.0\"
@@ -47,6 +51,7 @@ class RemoteServerJobTest < ActiveJob::TestCase
         -e \"LIQUID_BENCHMARK=false\"
         -e \"API_NAME=#{Rails.application.secrets.api_name}\"
         -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+        -e \"API_URL=shopify-rubybench.herokuapp.com\"
         -e \"INCLUDE_PATTERNS=bm_app_answer,bm_abc\"
         rubybench/ruby_releases".squish
     ].each do |command|
@@ -61,7 +66,8 @@ class RemoteServerJobTest < ActiveJob::TestCase
         ruby_memory_benchmarks: false,
         optcarrot_benchmarks: false,
         liquid_benchmarks: false,
-        include_patterns: 'bm_app_answer,bm_abc'
+        include_patterns: 'bm_app_answer,bm_abc',
+        organization: 'ruby'
       }
     )
   end
@@ -74,9 +80,11 @@ class RemoteServerJobTest < ActiveJob::TestCase
       "tsp docker run --rm
         --link discourse_postgres:postgres
         --link discourse_redis:redis
+        -e \"ORGANIZATION=ruby\"
         -e \"RUBY_VERSION=2.2.0\"
         -e \"API_NAME=#{Rails.application.secrets.api_name}\"
         -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+        -e \"API_URL=shopify-rubybench.herokuapp.com\"
         rubybench/ruby_releases_discourse".squish,
       "tsp docker stop discourse_postgres discourse_redis",
       "tsp docker rm -v discourse_postgres discourse_redis"
@@ -85,7 +93,7 @@ class RemoteServerJobTest < ActiveJob::TestCase
       @ssh.expects(:exec!).with(command)
     end
 
-    RemoteServerJob.new.perform('2.2.0', 'ruby_releases_discourse')
+    RemoteServerJob.new.perform('2.2.0', 'ruby_releases_discourse', { organization: 'ruby' })
   end
 
   test "#perform ruby_trunk_discourse" do
@@ -95,8 +103,10 @@ class RemoteServerJobTest < ActiveJob::TestCase
       "tsp docker run --name discourse_postgres -d postgres:9.3.5",
       "tsp docker run --rm --link discourse_postgres:postgres
         --link discourse_redis:redis -e \"RUBY_COMMIT_HASH=commit_hash\"
+        -e \"ORGANIZATION=ruby\"
         -e \"API_NAME=#{Rails.application.secrets.api_name}\"
         -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+        -e \"API_URL=shopify-rubybench.herokuapp.com\"
         rubybench/ruby_trunk_discourse".squish,
       "tsp docker stop discourse_postgres discourse_redis",
       "tsp docker rm -v discourse_postgres discourse_redis"
@@ -105,7 +115,7 @@ class RemoteServerJobTest < ActiveJob::TestCase
       @ssh.expects(:exec!).with(command)
     end
 
-    RemoteServerJob.new.perform('commit_hash', 'ruby_trunk_discourse')
+    RemoteServerJob.new.perform('commit_hash', 'ruby_trunk_discourse', { organization: 'ruby' })
   end
 
   test "#perform rails_releases" do
@@ -118,9 +128,11 @@ class RemoteServerJobTest < ActiveJob::TestCase
         --link postgres:postgres
         --link mysql:mysql
         --link redis:redis
+        -e \"ORGANIZATION=rails\"
         -e \"RAILS_VERSION=4.2.6\"
         -e \"API_NAME=#{Rails.application.secrets.api_name}\"
         -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+        -e \"API_URL=shopify-rubybench.herokuapp.com\"
         -e \"MYSQL2_PREPARED_STATEMENTS=1\"
         -e \"INCLUDE_PATTERNS=bm_activerecord_scope\"
         rubybench/rails_releases".squish,
@@ -132,7 +144,7 @@ class RemoteServerJobTest < ActiveJob::TestCase
     end
 
     RemoteServerJob.new.perform(
-      '4.2.6', 'rails_releases', include_patterns: "bm_activerecord_scope"
+      '4.2.6', 'rails_releases', { include_patterns: "bm_activerecord_scope", organization: 'rails' }
     )
 
     [
@@ -144,9 +156,11 @@ class RemoteServerJobTest < ActiveJob::TestCase
         --link postgres:postgres
         --link mysql:mysql
         --link redis:redis
+        -e \"ORGANIZATION=rails\"
         -e \"RAILS_VERSION=4.0.0\"
         -e \"API_NAME=#{Rails.application.secrets.api_name}\"
         -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+        -e \"API_URL=shopify-rubybench.herokuapp.com\"
         -e \"INCLUDE_PATTERNS=\"
         rubybench/rails_releases".squish,
       "tsp docker stop postgres mysql redis",
@@ -156,7 +170,7 @@ class RemoteServerJobTest < ActiveJob::TestCase
       @ssh.expects(:exec!).with(command)
     end
 
-    RemoteServerJob.new.perform('4.0.0', 'rails_releases')
+    RemoteServerJob.new.perform('4.0.0', 'rails_releases', { organization: 'rails' })
   end
 
   test "#perform rails_trunk" do
@@ -169,9 +183,11 @@ class RemoteServerJobTest < ActiveJob::TestCase
         --link postgres:postgres
         --link mysql:mysql
         --link redis:redis
+        -e \"ORGANIZATION=rails\"
         -e \"RAILS_COMMIT_HASH=1234\"
         -e \"API_NAME=#{Rails.application.secrets.api_name}\"
         -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+        -e \"API_URL=shopify-rubybench.herokuapp.com\"
         -e \"MYSQL2_PREPARED_STATEMENTS=1\"
         -e \"INCLUDE_PATTERNS=bm_activerecord_scope\"
         rubybench/rails_trunk".squish,
@@ -183,7 +199,7 @@ class RemoteServerJobTest < ActiveJob::TestCase
     end
 
     RemoteServerJob.new.perform(
-      '1234', 'rails_trunk', { include_patterns: 'bm_activerecord_scope' }
+      '1234', 'rails_trunk', { include_patterns: 'bm_activerecord_scope', organization: 'rails' }
     )
   end
 
@@ -191,9 +207,11 @@ class RemoteServerJobTest < ActiveJob::TestCase
     [
       "tsp docker pull rubybench/bundler_releases",
       "tsp docker run --rm
+        -e \"ORGANIZATION=bundler\"
         -e \"BUNDLER_VERSION=1.10.6\"
         -e \"API_NAME=#{Rails.application.secrets.api_name}\"
         -e \"API_PASSWORD=#{Rails.application.secrets.api_password}\"
+        -e \"API_URL=shopify-rubybench.herokuapp.com\"
         -e \"INCLUDE_PATTERNS=bm_something\"
         rubybench/bundler_releases".squish
     ].each do |command|
@@ -204,7 +222,8 @@ class RemoteServerJobTest < ActiveJob::TestCase
     RemoteServerJob.new.perform(
       '1.10.6', 'bundler_releases',
       {
-        include_patterns: 'bm_something'
+        include_patterns: 'bm_something',
+        organization: 'bundler'
       }
     )
   end
