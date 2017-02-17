@@ -31,7 +31,7 @@ class ReposController < ApplicationController
       versions = $redis.get(version_cache_key)
       @versions = JSON.parse(versions) if versions
 
-      versions_calculate_once = ActiveSupport::OrderedHash.new
+      versions_calculate_cache = ActiveSupport::OrderedHash.new
       @charts = @benchmark_type.benchmark_result_types.map do |benchmark_result_type|
         cache_key = "#{BenchmarkRun.charts_cache_key(@benchmark_type, benchmark_result_type)}:#{@benchmark_run_display_count}"
 
@@ -68,7 +68,7 @@ class ReposController < ApplicationController
               config[:environment] = environment
             end
 
-            versions_calculate_once[config[:commit]] ||= config
+            versions_calculate_cache[config[:commit]] ||= config
 
             # generate HTML
             "Commit: #{config[:commit]}<br>" \
@@ -76,7 +76,7 @@ class ReposController < ApplicationController
             "Commit Message: #{config[:commit_message]}<br>" \
             "#{environment}"
           end
-          @versions ||= versions_calculate_once.values
+          @versions ||= versions_calculate_cache.values
 
           $redis.set(cache_key, columns.to_json)
           # cache the `@versions` as well
@@ -99,7 +99,7 @@ class ReposController < ApplicationController
     if (@form_result_type = params[:result_type]) &&
        (@benchmark_type = find_benchmark_type_by_category(@form_result_type))
 
-      versions_calculate_once = ActiveSupport::OrderedHash.new
+      versions_calculate_cache = ActiveSupport::OrderedHash.new
       @charts = @benchmark_type.benchmark_result_types.map do |benchmark_result_type|
         benchmark_runs = BenchmarkRun.fetch_release_benchmark_runs(
           @form_result_type, benchmark_result_type
@@ -126,13 +126,13 @@ class ReposController < ApplicationController
             config[:environment] = environment
           end
 
-          versions_calculate_once[config[:version]] ||= config
+          versions_calculate_cache[config[:version]] ||= config
 
           # generate HTML
           "Version: #{config[:version]}<br>" \
           "#{environment}"
         end
-        @versions ||= versions_calculate_once.values
+        @versions ||= versions_calculate_cache.values
 
         [columns, benchmark_result_type]
       end.compact
