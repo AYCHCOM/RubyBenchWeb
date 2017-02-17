@@ -43,6 +43,9 @@ class ReposTest < ActionDispatch::IntegrationTest
 
     chart = JSON.parse(response.body, symbolize_names: true)[0]
     # must have these 4 keys
-    assert ([:benchmark_name, :datapoints, :measurement, :unit] - chart.keys).empty?
+    assert_includes chart.keys, :benchmark_name
+    assert_includes chart.keys, :datapoints
+    assert_includes chart.keys, :measurement
+    assert_includes chart.keys, :unit
   end
 end
