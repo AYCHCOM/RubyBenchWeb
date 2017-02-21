@@ -32,6 +32,12 @@ class ReposController < ApplicationController
       @versions = JSON.parse(versions) if versions
 
       versions_calculate_cache = ActiveSupport::OrderedHash.new
+
+      # `@benchmark_type` is the name of the benchmark - ex. 'Liquid parse', 'Optcarrot Lan_Master.nes'
+      # Each `@benchmark_type` can have >= 1 `benchmark_result_type`s, which are the names of the metrics that
+      #   the benchmark measures - ex. for 'Liquid parse', its `benchmark_result_type`s are 'Number of iterations per second'
+      #   and 'Allocated objects'
+      # Here, we are generating a chart for each of this benchmark's result types
       @charts = @benchmark_type.benchmark_result_types.map do |benchmark_result_type|
         cache_key = "#{BenchmarkRun.charts_cache_key(@benchmark_type, benchmark_result_type)}:#{@benchmark_run_display_count}"
 
@@ -48,34 +54,64 @@ class ReposController < ApplicationController
             benchmark_run.initiator.created_at
           end)
 
+          # Sample `columns` object (not exactly the same, but in this structure
+          # 
+          # {  
+          #   columns: "[{\"name\": \"ab_bench\", \"data\": [1.23, 1.23]}]",
+          #   categories: "[
+          #     \"Commit: b6589fc
+          #     Commit Date: 2017-02-09 20:56:19 UTC
+          #     Commit Message: fix something
+          #     ruby 2.2.0dev\", 
+          #
+          #     \"Commit: 356a192
+          #     Commit Date: 2017-02-09 20:56:20 UTC
+          #     Commit Message: fix something
+          #     ruby 2.2.0dev\"
+          #   ]"
+          # }
+          #
+          # columns[:columns] is a JSON string with the benchmark name and datapoints (ie. columns of data)
+          # columns[:categories] is a stringified JSON array with the versions that pop up when you hover over datapoints in the charts,
+          #   where each element is an HTML string (ie. category of each column)
+          #
+          # ChartBuilder::build_columns returns a hash with keys :columns, :categories 
+          # The return value of this do block becomes the value for the :categories
           columns = chart_builder.build_columns do |benchmark_run|
             environment = YAML.load(benchmark_run.environment)
 
             commit = benchmark_run.initiator
 
-            # generate the version object
-            config = {
+            # `version` is a JSON-friendly variation of the HTML strings in `columns[:categories]`
+            # Multiple HTML-converted `version`s make up `columns[:categories]`
+            version = {
               commit: commit.sha1[0..6],
               commit_date: commit.created_at,
               commit_message: commit.message.truncate(30)
             }
+            # If there is more information about the environment, we add it to `version` 
             if environment.is_a?(Hash)
-              # use the key(s) in `environment` instead of setting `config[:environment`]
-              config.merge!(environment)
-              # solely for the purpose of generating the correct HTML
+              # Use the key(s) in `environment` instead of setting `version[:environment]`
+              version.merge!(environment)
+              # Solely for the purpose of generating the correct HTML for `columns[:categories]`
               environment = hash_to_html(environment)
             else
-              config[:environment] = environment
+              # If `environment` is not a Hash, then it is not JSON friendly, so we need to make
+              #   a new key in `version`
+              version[:environment] = environment
             end
 
-            versions_calculate_cache[config[:commit]] ||= config
+            # Map each commit to its `version` object
+            versions_calculate_cache[version[:commit]] ||= version
 
-            # generate HTML
-            "Commit: #{config[:commit]}<br>" \
-            "Commit Date: #{config[:commit_date]}<br>" \
-            "Commit Message: #{config[:commit_message]}<br>" \
+            # Generate HTML to store in `columns[:categories]`
+            "Commit: #{version[:commit]}<br>" \
+            "Commit Date: #{version[:commit_date]}<br>" \
+            "Commit Message: #{version[:commit_message]}<br>" \
             "#{environment}"
           end
+          # We mapped commits to `version` objects, but in the end we only want the `version`
+          #   objects - this is why `versions_calculate_cache` is an ordered hash
           @versions ||= versions_calculate_cache.values
 
           $redis.set(cache_key, columns.to_json)
