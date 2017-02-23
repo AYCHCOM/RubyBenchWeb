@@ -69,11 +69,18 @@ class ViewBenchmarkGraphsTest < AcceptanceTest
 
     test "User should be able to see long running benchmark graph even without
       memory benchmarks".squish do
-
-      benchmark_run = create(:commit_benchmark_run)
-      benchmark_type = benchmark_run.benchmark_type
+      benchmark_type = create(:benchmark_type)
+      benchmark_result_type = create(:benchmark_result_type)
       repo = benchmark_type.repo
       org = repo.organization
+      commit = create(:commit, repo: repo)
+
+      benchmark_run = create(:commit_benchmark_run,
+        benchmark_result_type: benchmark_result_type,
+        benchmark_type: benchmark_type,
+        initiator: commit
+      )
+
       benchmark_run_category_humanize = benchmark_type.category.humanize
 
       visit repo_path(organization_name: org.name, repo_name: repo.name)
@@ -96,9 +103,12 @@ class ViewBenchmarkGraphsTest < AcceptanceTest
       benchmark_result_type = create(:benchmark_result_type)
 
       30.times do
+        commit = create(:commit, repo: repo)
         create(
-          :commit_benchmark_run, benchmark_type: benchmark_type,
-          benchmark_result_type: benchmark_result_type
+          :commit_benchmark_run,
+          benchmark_type: benchmark_type,
+          benchmark_result_type: benchmark_result_type,
+          initiator: commit
         )
       end
 
