@@ -1,0 +1,8 @@
+#!/bin/bash
+
+mkdir ruby
+cd ruby
+git init
+git checkout -b trunk
+git pull https://github.com/ruby/ruby.git
+git push https://$GITHUB_API_TOKEN@github.com/shopify/ruby-mirror trunk
