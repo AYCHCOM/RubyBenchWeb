@@ -160,7 +160,7 @@ GEM
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
     public_suffix (2.0.4)
-    puma (3.10.0)
+    puma (3.12.4)
     rack (2.0.3)
     rack-mini-profiler (0.10.1)
       rack (>= 1.2.0)
