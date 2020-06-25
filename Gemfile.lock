@@ -161,7 +161,7 @@ GEM
       websocket-driver (>= 0.2.0)
     public_suffix (2.0.4)
     puma (3.10.0)
-    rack (2.0.3)
+    rack (2.2.3)
     rack-mini-profiler (0.10.1)
       rack (>= 1.2.0)
     rack-protection (2.0.0.beta2)
