@@ -100,6 +100,7 @@ GEM
     connection_pool (2.2.1)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
+    crass (1.0.6)
     database_cleaner (1.5.3)
     debug_inspector (0.0.2)
     erubis (2.7.0)
@@ -133,7 +134,8 @@ GEM
     launchy (2.4.3)
       addressable (~> 2.3)
     logster (1.2.6)
-    loofah (2.0.3)
+    loofah (2.18.0)
+      crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.6.4)
       mime-types (>= 1.16, < 4)
@@ -183,8 +185,8 @@ GEM
     rails-dom-testing (2.0.1)
       activesupport (>= 4.2.0, < 6.0)
       nokogiri (~> 1.6.0)
-    rails-html-sanitizer (1.0.3)
-      loofah (~> 2.0)
+    rails-html-sanitizer (1.4.3)
+      loofah (~> 2.3)
     rails_12factor (0.0.3)
       rails_serve_static_assets
       rails_stdout_logging
